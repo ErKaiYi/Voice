@@ -91,6 +91,7 @@ class LocalFolderPickerViewModel(
         try {
             val sm = context.getSystemService(Context.STORAGE_SERVICE) as StorageManager
             val getVolumePathsMethod = StorageManager::class.java.getDeclaredMethod("getVolumePaths")
+            @Suppress("UNCHECKED_CAST")
             val volumePaths = getVolumePathsMethod.invoke(sm) as Array<String>
             for (path in volumePaths) {
                 val f = File(path)
