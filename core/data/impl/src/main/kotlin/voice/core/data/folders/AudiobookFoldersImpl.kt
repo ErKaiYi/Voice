@@ -1,5 +1,4 @@
 package voice.core.data.folders
-
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -36,13 +35,10 @@ internal constructor(
   private val analytics: Analytics,
   private val persistedUriPermissions: PersistedUriPermissions,
 ) : AudiobookFolders {
-
   private val scope = MainScope()
-
   // allowing access to a folder that's already stored again leaves the stores unchanged, so they
   // don't emit
   private val grantsChanged = MutableStateFlow(0)
-
   private val storedFolders: Flow<StoredFolders> =
     combine(
         FolderType.entries.map { folderType ->
@@ -57,7 +53,6 @@ internal constructor(
       // reading the access asks the system, which the library would otherwise do on the main thread
       // at start
       .flowOn(Dispatchers.IO)
-
   public override fun all(): Flow<Map<FolderType, List<DocumentFileWithUri>>> {
     return storedFolders.map { folders ->
       folders.stored.mapValues { (folderType, uris) ->
@@ -72,7 +67,6 @@ internal constructor(
       }
     }
   }
-
   public override fun withoutAccess(): Flow<Map<FolderType, List<Uri>>> {
     return storedFolders.map { folders ->
       folders.stored.mapValues { (_, uris) ->
@@ -80,25 +74,24 @@ internal constructor(
       }
     }
   }
-
   private fun Uri.toDocumentFile(folderType: FolderType): CachedDocumentFile {
     val uri =
       when {
         // local files do not go through the document tree, so there is no tree document id
         scheme == "file" -> this
         folderType == FolderType.SingleFile -> this
-        FolderType.SingleFolder,
-        FolderType.Root,
-        FolderType.Author -> {
+        folderType == FolderType.SingleFolder ||
+        folderType == FolderType.Root ||
+        folderType == FolderType.Author -> {
           DocumentsContract.buildDocumentUriUsingTree(
             this,
             DocumentsContract.getTreeDocumentId(this),
           )
         }
+        else -> this
       }
     return cachedDocumentFileFactory.create(uri)
   }
-
   public override fun add(
     uri: Uri,
     type: FolderType,
@@ -118,7 +111,6 @@ internal constructor(
         }
     }
   }
-
   // one at a time, as taking both takes nothing when the picker only granted reading
   private fun takePermission(
     uri: Uri,
@@ -137,7 +129,6 @@ internal constructor(
       Logger.w("Could only take the read permission for a $type folder")
     }
   }
-
   public override fun remove(
     uri: Uri,
     folderType: FolderType,
@@ -157,7 +148,6 @@ internal constructor(
       }
     }
   }
-
   private fun dataStore(type: FolderType): DataStore<Set<Uri>> {
     return when (type) {
       FolderType.SingleFile -> singleFileAudiobookFoldersStore
@@ -166,7 +156,6 @@ internal constructor(
       FolderType.Author -> authorAudiobookFoldersStore
     }
   }
-
   public override suspend fun hasAnyFolders(): Boolean {
     // folders without access count too, as the library asks to allow access to them again
     return FolderType.entries.any {
@@ -174,10 +163,8 @@ internal constructor(
     }
   }
 }
-
 private class StoredFolders(
   val stored: Map<FolderType, Set<Uri>>,
   val withAccess: Set<Uri>,
 )
-
 private fun Uri.isFileUri(): Boolean = scheme == "file"
