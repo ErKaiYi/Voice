@@ -46,6 +46,15 @@ class LocalFolderPickerViewModel(
         scope.launch { load(dir) }
     }
 
+    // UI手动输入路径调用，不做exists前置校验，适配车机ROM特殊行为
+    fun openRawPath(pathText: String) {
+        val trimmed = pathText.trim()
+        if (trimmed.isNotEmpty()) {
+            val target = File(trimmed)
+            scope.launch { load(target) }
+        }
+    }
+
     fun goUp() {
         val parent = currentDir?.parentFile
         // stay within the known mounts; going above them returns to the root list
@@ -81,13 +90,12 @@ class LocalFolderPickerViewModel(
 
     private fun mountPoints(): List<File> {
         val roots = mutableListOf<File>()
-        // 1. 内置模拟存储
+        // 内置存储保底，永远要有
         val internalStorage = File("/storage/emulated/0")
         if (internalStorage.exists() && internalStorage.canRead()) {
             roots.add(internalStorage)
         }
 
-        // 2. 反射 StorageManager getVolumePaths 获取真实挂载卷（Android9）
         try {
             val sm = context.getSystemService(Context.STORAGE_SERVICE) as StorageManager
             val getVolumePathsMethod = StorageManager::class.java.getDeclaredMethod("getVolumePaths")
@@ -95,7 +103,6 @@ class LocalFolderPickerViewModel(
             val volumePaths = getVolumePathsMethod.invoke(sm) as Array<String>
             for (path in volumePaths) {
                 val f = File(path)
-                // 排除父目录 /storage /mnt，只保留实际挂载点；排除 emulated（已添加）
                 if (!path.equals("/storage") && !path.equals("/mnt")
                     && !path.contains("emulated")
                     && f.exists() && f.canRead()
@@ -104,15 +111,7 @@ class LocalFolderPickerViewModel(
                 }
             }
         } catch (_: Exception) {
-            // 反射失败：兜底扫描 /storage 匹配 XXXX‑XXXX U盘命名格式
-            val storageDir = File("/storage")
-            storageDir.listFiles()?.forEach { f ->
-                if (f.name.matches(Regex("[0‑9A‑F]{4}\\-[0‑9A‑F]{4}"))
-                    && f.exists() && f.canRead()
-                ) {
-                    roots.add(f)
-                }
-            }
+            // 安卓9车机ROM限制，/storage无法listFiles，放弃自动枚举U盘，依靠手动输入路径入口
         }
 
         return roots
