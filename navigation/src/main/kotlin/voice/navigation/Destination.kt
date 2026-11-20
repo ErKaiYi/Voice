@@ -158,6 +158,12 @@ sealed interface Destination {
     override val trackingName: String = "AddContent"
   }
 
+  // in-app folder browser for builds without a system file picker (e.g. modified car ROMs)
+  @Serializable
+  data class LocalFolderPicker(val origin: Origin) : Compose {
+    override val trackingName: String = "LocalFolderPicker"
+  }
+
   @Serializable
   data class AudiobookshelfLogin(
     val origin: Origin,

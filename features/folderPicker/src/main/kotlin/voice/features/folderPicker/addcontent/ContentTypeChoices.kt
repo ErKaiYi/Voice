@@ -24,6 +24,7 @@ import voice.features.folderPicker.folderPicker.FileTypeSelection
 internal fun ColumnScope.ContentTypeChoices(
   onAdd: (FileTypeSelection, Uri) -> Unit,
   onFolderPickerCancel: () -> Unit,
+  onChooseLocalFolder: () -> Unit,
   onNoPicker: () -> Unit,
   onConnectAudiobookshelf: (() -> Unit)?,
 ) {
@@ -33,24 +34,9 @@ internal fun ColumnScope.ContentTypeChoices(
         onAdd(FileTypeSelection.File, uri)
       }
     }
-  val documentTreeLauncher =
-    rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
-      if (uri != null) {
-        onAdd(FileTypeSelection.Folder, uri)
-      } else {
-        onFolderPickerCancel()
-      }
-    }
   OnboardingButton(
     text = stringResource(StringsR.string.folder_add_action_folder),
-    onClick = {
-      try {
-        documentTreeLauncher.launch(null)
-      } catch (e: ActivityNotFoundException) {
-        Logger.w(e, "Could not add folder")
-        onNoPicker()
-      }
-    },
+    onClick = onChooseLocalFolder,
   )
   if (onConnectAudiobookshelf != null) {
     OnboardingButton(

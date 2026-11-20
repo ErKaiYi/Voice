@@ -9,7 +9,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
-import androidx.documentfile.provider.DocumentFile
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
@@ -38,7 +37,6 @@ class SelectFolderTypeViewModel(
   private val bookPreviewer: BookPreviewer,
   private val analytics: Analytics,
   @Assisted private val uri: Uri,
-  @Assisted private val documentFile: DocumentFile,
   @Assisted private val origin: Origin,
   @Assisted private val currentType: FolderType?,
 ) {
@@ -85,7 +83,7 @@ class SelectFolderTypeViewModel(
   @Composable
   internal fun viewState(): SelectFolderTypeViewState {
     val folder: CachedDocumentFile = remember {
-      documentFileFactory.create(documentFile.uri)
+      documentFileFactory.create(uri)
     }
     val folderName by
       produceState(initialValue = "") {
@@ -183,7 +181,6 @@ class SelectFolderTypeViewModel(
   interface Factory {
     fun create(
       uri: Uri,
-      documentFile: DocumentFile,
       origin: Origin,
       currentType: FolderType?,
     ): SelectFolderTypeViewModel

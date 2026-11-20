@@ -47,6 +47,7 @@ fun AddContent(origin: Origin) {
       viewModel.add(uri, folderType)
     },
     onFolderPickerCancel = viewModel::onFolderPickerCancel,
+    onChooseLocalFolder = viewModel::chooseLocalFolder,
     onHelpAnswer = viewModel::onHelpAnswer,
     onOpenLibriVox = viewModel::openLibriVox,
     onHelpSurvey = viewModel::openHelpSurvey,

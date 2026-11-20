@@ -62,7 +62,7 @@ internal constructor(
     return storedFolders.map { folders ->
       folders.stored.mapValues { (folderType, uris) ->
         uris
-          .filter { it in folders.withAccess }
+          .filter { it in folders.withAccess || it.isFileUri() }
           .map { uri ->
             DocumentFileWithUri(
               documentFile = uri.toDocumentFile(folderType),
@@ -76,15 +76,17 @@ internal constructor(
   public override fun withoutAccess(): Flow<Map<FolderType, List<Uri>>> {
     return storedFolders.map { folders ->
       folders.stored.mapValues { (_, uris) ->
-        uris.filter { it !in folders.withAccess }
+        uris.filter { it !in folders.withAccess && !it.isFileUri() }
       }
     }
   }
 
   private fun Uri.toDocumentFile(folderType: FolderType): CachedDocumentFile {
     val uri =
-      when (folderType) {
-        FolderType.SingleFile -> this
+      when {
+        // local files do not go through the document tree, so there is no tree document id
+        scheme == "file" -> this
+        folderType == FolderType.SingleFile -> this
         FolderType.SingleFolder,
         FolderType.Root,
         FolderType.Author -> {
@@ -177,3 +179,5 @@ private class StoredFolders(
   val stored: Map<FolderType, Set<Uri>>,
   val withAccess: Set<Uri>,
 )
+
+private fun Uri.isFileUri(): Boolean = scheme == "file"

@@ -27,6 +27,7 @@ internal fun SelectFolder(
   /** Null while connecting a server isn't available. */
   onConnectAudiobookshelf: (() -> Unit)?,
   onFolderPickerCancel: () -> Unit,
+  onChooseLocalFolder: () -> Unit,
   onHelpAnswer: (FolderHelpAnswer) -> Unit,
   onOpenLibriVox: () -> Unit,
   onHelpSurvey: () -> Unit,
@@ -79,6 +80,7 @@ internal fun SelectFolder(
           help = FolderHelp.PickerClosed
           onFolderPickerCancel()
         },
+        onChooseLocalFolder = onChooseLocalFolder,
         onNoPicker = { help = FolderHelp.NoPicker },
         onConnectAudiobookshelf = onConnectAudiobookshelf,
       )
@@ -95,6 +97,7 @@ private fun SelectFolderPreview() {
       onAdd = { _, _ -> },
       onConnectAudiobookshelf = {},
       onFolderPickerCancel = {},
+      onChooseLocalFolder = {},
       onHelpAnswer = {},
       onOpenLibriVox = {},
       onHelpSurvey = {},

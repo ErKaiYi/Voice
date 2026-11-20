@@ -8,6 +8,9 @@ import dev.zacsweers.metro.ContributesBinding
 @ContributesBinding(AppScope::class)
 class RealCachedDocumentFileFactory(private val context: Context) : CachedDocumentFileFactory {
   override fun create(uri: Uri): CachedDocumentFile {
+    if (uri.scheme == "file") {
+      return FileBasedDocumentFactory.create(uri)
+    }
     return RealCachedDocumentFile(context = context, uri = uri, preFilledContent = null)
   }
 }

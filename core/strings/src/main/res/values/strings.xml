@@ -295,6 +295,20 @@
     <string name="folder.add.title.default">Add your Audiobook(s)</string>
     <!-- Title for the folder picker when adding the first audiobook during onboarding. -->
     <string name="folder.add.title.onboarding">Add Your First Audiobook</string>
+    <!-- Title of the in-app folder browser shown on devices without a system file picker. -->
+    <string name="folder.local.title">Browse folders</string>
+    <!-- Action in the in-app folder browser to go back to the parent folder. -->
+    <string name="folder.local.up">Up one level</string>
+    <!-- Action in the in-app folder browser to add the currently shown folder. -->
+    <string name="folder.local.pick">Choose this folder</string>
+    <!-- Shown in the in-app folder browser when the current folder has no subfolders. -->
+    <string name="folder.local.empty">No folders here</string>
+    <!-- Title asking for storage access so the in-app folder browser can read local folders. -->
+    <string name="folder.local.permission.title">Storage access needed</string>
+    <!-- Explanation why the app needs storage access for the in-app folder browser. -->
+    <string name="folder.local.permission.message">Voice needs storage access to browse your audiobook folders.</string>
+    <!-- Button to grant the storage access the in-app folder browser needs. -->
+    <string name="folder.local.permission.request">Grant access</string>
     <!-- Short label in the folder settings for a folder whose subfolders are authors, each holding book folders. -->
     <string name="folder.mode.author.label">Folders are authors</string>
     <!-- Option for how books are found in a picked folder. %s is the folder name. Its subfolders are authors, their subfolders are books. -->

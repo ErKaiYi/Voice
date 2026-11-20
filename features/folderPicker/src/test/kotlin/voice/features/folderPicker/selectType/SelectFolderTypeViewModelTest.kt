@@ -1,7 +1,6 @@
 package voice.features.folderPicker.selectType
 
 import androidx.core.net.toUri
-import androidx.documentfile.provider.DocumentFile
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.molecule.RecompositionMode
 import app.cash.molecule.launchMolecule
@@ -321,7 +320,6 @@ class SelectFolderTypeViewModelTest {
       bookPreviewer = bookPreviewer,
       analytics = analytics,
       uri = folder.toUri(),
-      documentFile = DocumentFile.fromFile(folder),
       origin = origin,
       currentType = currentType,
     )

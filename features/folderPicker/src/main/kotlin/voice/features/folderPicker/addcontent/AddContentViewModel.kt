@@ -66,6 +66,11 @@ class AddContentViewModel(
     analytics.event("folder_picker_cancelled")
   }
 
+  // devices without a system file picker (e.g. modified car ROMs) use the in-app browser instead
+  internal fun chooseLocalFolder() {
+    navigator.goTo(Destination.LocalFolderPicker(origin))
+  }
+
   internal fun onHelpAnswer(answer: FolderHelpAnswer) {
     analytics.event("folder_help_answer", mapOf("answer" to answer.value()))
   }
