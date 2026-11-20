@@ -2,6 +2,7 @@ package voice.features.folderPicker.localpicker
 
 import android.content.Context
 import android.os.StorageManager
+import androidx.compose.runtime.mutableStateOf
 import androidx.core.net.toUri
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
@@ -23,8 +24,8 @@ import voice.navigation.Origin
 class LocalFolderPickerViewModel(
     private val navigator: Navigator,
     private val dispatcherProvider: DispatcherProvider,
-    @Assisted private val origin: Origin,
     private val context: Context,
+    @Assisted private val origin: Origin,
 ) {
     private val scope = MainScope(dispatcherProvider)
     /** Null means the top level with the available storage mounts. */
