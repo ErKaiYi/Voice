@@ -1,7 +1,7 @@
 package voice.features.folderPicker.localpicker
 
 import android.content.Context
-import android.os.StorageManager
+import android.os.storage.StorageManager
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
