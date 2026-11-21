@@ -20,8 +20,7 @@ import voice.navigation.Navigator
 import voice.navigation.Origin
 
 /**
- * In‑app folder browser for devices without a system file picker (e.g. modified car ROMs).
- * Browses local directories directly and hands the picked folder to the existing type selection.
+ * In‑app folder browser for devices without system file picker (car android9)
  */
 @AssistedInject
 class LocalFolderPickerViewModel(
@@ -32,7 +31,7 @@ class LocalFolderPickerViewModel(
 ) {
     private val scope = MainScope(dispatcherProvider)
     private val TAG = "LocalFolderPicker"
-    /** Null means the top level with the available storage mounts. */
+
     var currentDir: File? by mutableStateOf(null)
         private set
     var entries: List<File> by mutableStateOf(emptyList())
@@ -49,7 +48,6 @@ class LocalFolderPickerViewModel(
         scope.launch { load(dir) }
     }
 
-    // UI手动输入路径调用，不做exists前置校验，适配车机ROM特殊行为
     fun openRawPath(pathText: String) {
         val trimmed = pathText.trim()
         Log.d(TAG, "openRawPath input: $trimmed")
@@ -63,7 +61,6 @@ class LocalFolderPickerViewModel(
     fun goUp() {
         val parent = currentDir?.parentFile
         Log.d(TAG, "goUp parent: ${parent?.absolutePath}")
-        // stay within the known mounts; going above them returns to the root list
         scope.launch { load(parent?.takeIf { it.isReadableMount() }) }
     }
 
@@ -79,20 +76,18 @@ class LocalFolderPickerViewModel(
 
     private suspend fun load(dir: File?) {
         loading = true
-        val list =
-            withContext(dispatcherProvider.io) {
-                if (dir == null) {
-                    mountPoints()
-                } else {
-                    Log.d(TAG, "reading dir: ${dir.absolutePath}")
-                    // 重点改动：不要 ?: emptyList()，如果listFiles返回null，我们尝试二次兜底
-                    val rawFiles = dir.listFiles()
-                    Log.d(TAG, "listFiles result: $rawFiles")
-                    val files = rawFiles ?: emptyArray()
-                    files.filter { it.isDirectory && it.canRead() && !it.name.startsWith(".") }
-                        .sortedBy { it.name.lowercase() }
-                }
+        val list = withContext(dispatcherProvider.io) {
+            if (dir == null) {
+                mountPoints()
+            } else {
+                Log.d(TAG, "reading dir: ${dir.absolutePath}")
+                val rawFiles = dir.listFiles()
+                Log.d(TAG, "listFiles result: $rawFiles")
+                val files = rawFiles ?: emptyArray()
+                files.filter { it.isDirectory && it.canRead() && !it.name.startsWith(".") }
+                    .sortedBy { it.name.lowercase() }
             }
+        }
         Log.d(TAG, "final entries size: ${list.size}")
         currentDir = dir
         entries = list
@@ -101,7 +96,6 @@ class LocalFolderPickerViewModel(
 
     private fun mountPoints(): List<File> {
         val roots = mutableListOf<File>()
-        // 内置存储保底，永远要有
         val internalStorage = File("/storage/emulated/0")
         Log.d(TAG, "internal storage: ${internalStorage.absolutePath}, exists=${internalStorage.exists()}")
         if (internalStorage.exists() && internalStorage.canRead()) {
@@ -125,7 +119,6 @@ class LocalFolderPickerViewModel(
             }
         } catch (e: Exception) {
             Log.e(TAG, "reflect getVolumePaths failed", e)
-            // 安卓9车机ROM限制，/storage无法listFiles，放弃自动枚举U盘，依靠手动输入路径入口
         }
 
         Log.d(TAG, "mountPoints list: ${roots.map { it.absolutePath }}")
@@ -139,6 +132,6 @@ class LocalFolderPickerViewModel(
 
     @AssistedFactory
     interface Factory {
-        fun create(origin: Origin): Origin
+        fun create(origin: Origin): LocalFolderPickerViewModel // ✅ 修复返回类型！
     }
 }
