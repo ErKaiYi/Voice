@@ -1,6 +1,5 @@
 package voice.features.folderPicker.localpicker
 import androidx.compose.runtime.Composable
-import androidx.compose.foundation.layout.plus
 import android.Manifest
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -81,7 +80,7 @@ object LocalFolderPickerProvider {
 
 @Composable
 fun LocalFolderPicker(origin: Origin) {
-    val viewModel =
+    val viewModel: LocalFolderPickerViewModel =
         retain(origin.name) {
             rootGraphAs<LocalFolderPickerGraph>().localFolderPickerFactory.create(origin)
         }
@@ -138,7 +137,6 @@ private fun FolderList(
     var showManualPathDialog by rememberSaveable { mutableStateOf(false) }
     var manualPathInput by rememberSaveable { mutableStateOf("") }
 
-    // 手动路径弹窗，不再做File存在性校验，直接调用viewModel.openRawPath
     if (showManualPathDialog) {
         AlertDialog(
             onDismissRequest = { showManualPathDialog = false },
@@ -147,7 +145,7 @@ private fun FolderList(
                 OutlinedTextField(
                     value = manualPathInput,
                     onValueChange = { manualPathInput = it },
-                    placeholder = { Text("/storage/287C‑8A31") },
+                    placeholder = { Text("/storage/287C-8A31") },
                     singleLine = true
                 )
             },
@@ -243,7 +241,7 @@ private fun FolderList(
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 OnboardingButton(
-                    text = "手动输入路径(OTG‑U盘)",
+                    text = "手动输入路径(OTG-U盘)",
                     onClick = { showManualPathDialog = true }
                 )
             }
